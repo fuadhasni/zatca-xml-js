@@ -1,5 +1,4 @@
 import { EGSUnitInfo } from "../egs";
-import { ZATCASimplifiedTaxInvoice } from "../ZATCASimplifiedTaxInvoice";
 import defaultBillingReference from "./invoice_billing_reference_template";
 import standardInvoiceCustomer from "./invoice_customer_party_template";
 import {ZATCAInvoiceTypes, 
