@@ -12,6 +12,7 @@ import fs from "fs";
 import defaultCSRConfig from "../templates/csr_template";
 import API from "../api";
 import { ZATCASimplifiedTaxInvoice } from "../ZATCASimplifiedTaxInvoice";
+import { ZATCAStandardTaxInvoice } from "../ZATCAStandardTaxInvoice";
 
 export interface EGSUnitLocation {
     city: string,
@@ -237,7 +238,7 @@ export class EGS {
      * @param production Boolean production or compliance certificate.
      * @returns Promise void on success (signed_invoice_string: string, invoice_hash: string, qr: string), throws error on fail.
      */
-    signInvoice(invoice: ZATCASimplifiedTaxInvoice, production?: boolean): {signed_invoice_string: string, invoice_hash: string, qr: string} {
+    signInvoice(invoice: ZATCASimplifiedTaxInvoice | ZATCAStandardTaxInvoice, production?: boolean): {signed_invoice_string: string, invoice_hash: string, qr: string} {
         const certificate = production ? this.egs_info.production_certificate : this.egs_info.compliance_certificate;
         if (!certificate || !this.egs_info.private_key) throw new Error("EGS is missing a certificate/private key to sign the invoice.");
 
