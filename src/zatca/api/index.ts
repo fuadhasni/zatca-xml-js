@@ -170,7 +170,7 @@ class API {
             const headers = {
                 "Accept-Version": settings.API_VERSION,
                 "Accept-Language": "en",
-                "Clearance-Status": "0"
+                "Clearance-Status": "1"
             };
 
             const response = await axios.post(`${settings.SANDBOX_BASEURL}/invoices/clearance/single`,
