@@ -27,7 +27,11 @@ const template = /* XML */`
                 <cbc:RegistrationName>SET_CUSTOMER_REGISTERED_NAME</cbc:RegistrationName>
             </cac:PartyLegalEntity>
         </cac:Party>
-    </cac:AccountingCustomerParty>`;
+    </cac:AccountingCustomerParty>
+    <cac:Delivery>
+        <cbc:ActualDeliveryDate>2022-03-13</cbc:ActualDeliveryDate>
+        <cbc:LatestDeliveryDate>2023-01-27</cbc:LatestDeliveryDate>
+    </cac:Delivery>`;
 
 
 export default function populate(
