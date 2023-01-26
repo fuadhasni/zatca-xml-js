@@ -45,6 +45,15 @@ interface ProductionAPIInterface {
      */
       reportInvoice: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
 
+     /**
+     * Clear Standard Invoice signed ZATCA XML.
+     * @param signed_xml_string String.
+     * @param invoice_hash String.
+     * @param egs_uuid String.
+     * @returns Any status.
+     */
+        clearInvoice: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
+
 }
 
 
@@ -157,9 +166,31 @@ class API {
             return response.data;
         }
 
+        const clearInvoice = async (signed_xml_string: string, invoice_hash: string, egs_uuid: string): Promise<any> => {
+            const headers = {
+                "Accept-Version": settings.API_VERSION,
+                "Accept-Language": "en",
+                "Clearance-Status": "0"
+            };
+
+            const response = await axios.post(`${settings.SANDBOX_BASEURL}/invoices/clearance/single`,
+                {
+                    invoiceHash: invoice_hash,
+                    uuid: egs_uuid,
+                    invoice: Buffer.from(signed_xml_string).toString("base64")
+                },
+                {headers: {...auth_headers, ...headers}}
+            );
+                        
+            if (response.status != 200) throw new Error("Error in reporting invoice.");
+            return response.data;
+        }
+
+
         return {
             issueCertificate,
-            reportInvoice
+            reportInvoice,
+            clearInvoice
         }
     }
   
