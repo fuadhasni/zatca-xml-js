@@ -29,7 +29,7 @@ Number.prototype.toFixedNoRounding = function(n: number) {
     return "0.00";
 }
 
-export {ZATCASimplifiedInvoiceLineItem, ZATCAStandardInvoiceProps, ZATCAInvoiceTypes, ZATCAPaymentMethods};
+export {ZATCASimplifiedInvoiceLineItem, ZATCAStandardInvoiceProps, ZATCAInvoiceTypes, ZATCAPaymentMethods, ZATCAStandardInvoiceCustomer};
 export class ZATCAStandardTaxInvoice {
 
     private invoice_xml: XMLDocument;
