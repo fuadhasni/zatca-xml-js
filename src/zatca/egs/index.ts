@@ -232,6 +232,22 @@ export class EGS {
         );
     }
 
+        /**
+     * Clears Standard invoice with ZATCA API.
+     * @param signed_invoice_string String.
+     * @param invoice_hash String.
+     * @returns Promise reporting data on success, throws error on fail.
+     */
+        async clearInvoice(signed_invoice_string: string, invoice_hash: string): Promise<any> {
+            if(!this.egs_info.production_certificate || !this.egs_info.production_api_secret) throw new Error("EGS is missing a certificate/private key/api secret to report the invoice.")
+    
+            return await this.api.production(this.egs_info.production_certificate, this.egs_info.production_api_secret).clearInvoice(
+                signed_invoice_string,
+                invoice_hash,
+                this.egs_info.uuid
+            );
+        }
+
     /**
      * Signs a given invoice using the EGS certificate and keypairs.
      * @param invoice Invoice to sign
