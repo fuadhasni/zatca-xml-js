@@ -92,7 +92,8 @@ export interface ZATCAStandardInvoiceCustomer {
     city: string,
     postcode: string,
     country_subentity: '-',
-    country: 'SA'
+    country: 'SA',
+    vat_id?: string
 }
 
 export interface ZATCAStandardInvoiceProps extends ZATCASimplifiedInvoiceProps {
