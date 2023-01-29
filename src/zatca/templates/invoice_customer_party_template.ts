@@ -3,7 +3,7 @@ const template = /* XML */`
 <cac:AccountingCustomerParty>
         <cac:Party>
             <cac:PartyIdentification>
-                <cbc:ID schemeID="NAT">SET_CUSTOMER_VAT</cbc:ID>
+                <cbc:ID schemeID="CRN">SET_CUSTOMER_CRN</cbc:ID>
             </cac:PartyIdentification>
             <cac:PostalAddress>
                 <cbc:StreetName>SET_CUSTOMER_STREET</cbc:StreetName>
@@ -43,7 +43,7 @@ export default function populate(
     populated_template = populated_template.replace("SET_CUSTOMER_CITY_SUB_DIVISION_NAME", `${customer.city_subdivision_name}`);
     populated_template = populated_template.replace("SET_CUSTOMER_CITY_NAME", `${customer.city}`);
     populated_template = populated_template.replace("SET_CUSTOMER_POSTAL_CODE", `${customer.postcode}`);
-    populated_template = populated_template.replace("SET_CUSTOMER_VAT", `${customer.vat_id}`);
+    populated_template = populated_template.replace("SET_CUSTOMER_CRN", `${customer.crn || '000'}`);
     /** TODO replace hardcoded values with replace */
     return populated_template;
 };
