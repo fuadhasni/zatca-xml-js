@@ -3,7 +3,7 @@ const template = /* XML */`
 <cac:AccountingCustomerParty>
         <cac:Party>
             <cac:PartyIdentification>
-                <cbc:ID schemeID="CRN">SET_CUSTOMER_CRN</cbc:ID>
+                <cbc:ID schemeID="NAT">SET_CUSTOMER_CRN</cbc:ID>
             </cac:PartyIdentification>
             <cac:PostalAddress>
                 <cbc:StreetName>SET_CUSTOMER_STREET</cbc:StreetName>
