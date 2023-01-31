@@ -4,8 +4,8 @@ import { cleanUpCertificateString } from "../signing";
 
 const settings = {
     API_VERSION: "V2",
-    SANDBOX_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/developer-portal",
-    PRODUCTION_BASEURL: "TODO"
+    SANDBOX_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/core",
+    PRODUCTION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/core"
 }
 
 interface ComplianceAPIInterface {
