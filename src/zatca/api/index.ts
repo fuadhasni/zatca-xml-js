@@ -59,9 +59,10 @@ interface ProductionAPIInterface {
 
 class API {
 
-    constructor () {
+    baseUrl;
+    constructor (isProduction: boolean = false) {
+        this.baseUrl = isProduction? settings.PRODUCTION_BASEURL : settings.SANDBOX_BASEURL;
     }
-
 
     private getAuthHeaders = (certificate?: string, secret?: string): any => {
         if (certificate && secret) {
@@ -84,7 +85,7 @@ class API {
                 OTP: otp
             };
 
-            const response = await axios.post(`${settings.SANDBOX_BASEURL}/compliance`,
+            const response = await axios.post(`${this.baseUrl}/compliance`,
                 {csr: Buffer.from(csr).toString("base64")},
                 {headers: {...auth_headers, ...headers}}
             );
@@ -104,7 +105,7 @@ class API {
                 "Accept-Language": "en",
             };
 
-            const response = await axios.post(`${settings.SANDBOX_BASEURL}/compliance/invoices`,
+            const response = await axios.post(`${this.baseUrl}/compliance/invoices`,
                 {
                     invoiceHash: invoice_hash,
                     uuid: egs_uuid,
@@ -132,7 +133,7 @@ class API {
                 "Accept-Version": settings.API_VERSION
             };
 
-            const response = await axios.post(`${settings.SANDBOX_BASEURL}/production/csids`,
+            const response = await axios.post(`${this.baseUrl}/production/csids`,
                 {compliance_request_id: compliance_request_id},
                 {headers: {...auth_headers, ...headers}}
             );
@@ -153,7 +154,7 @@ class API {
                 "Clearance-Status": "0"
             };
 
-            const response = await axios.post(`${settings.SANDBOX_BASEURL}/invoices/reporting/single`,
+            const response = await axios.post(`${this.baseUrl}/invoices/reporting/single`,
                 {
                     invoiceHash: invoice_hash,
                     uuid: egs_uuid,
@@ -173,7 +174,7 @@ class API {
                 "Clearance-Status": "1"
             };
 
-            const response = await axios.post(`${settings.SANDBOX_BASEURL}/invoices/clearance/single`,
+            const response = await axios.post(`${this.baseUrl}/invoices/clearance/single`,
                 {
                     invoiceHash: invoice_hash,
                     uuid: egs_uuid,
