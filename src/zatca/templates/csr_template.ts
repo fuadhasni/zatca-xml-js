@@ -31,7 +31,7 @@ SN = SET_EGS_SERIAL_NUMBER
 # VAT Registration number of TaxPayer (Organization identifier [15 digits begins with 3 and ends with 3])
 UID = SET_VAT_REGISTRATION_NUMBER
 # Invoice type (TSCZ)(1 = supported, 0 not supported) (Tax, Simplified, future use, future use)
-title = 0100
+title = 1000
 # Location (branch address or website)
 registeredAddress = SET_BRANCH_LOCATION
 # Industry (industry sector name)
