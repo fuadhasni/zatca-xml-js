@@ -45,7 +45,7 @@ businessCategory = SET_BRANCH_INDUSTRY
 commonName = SET_COMMON_NAME
 
 # Organization Unit (Branch name)
-organizationalUnitName = SET_BRANCH_NAME
+organizationalUnitName = 4030182668
 
 # Organization name (Tax payer name)
 organizationName = SET_TAXPAYER_NAME
