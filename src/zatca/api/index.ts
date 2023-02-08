@@ -5,7 +5,8 @@ import { cleanUpCertificateString } from "../signing";
 const settings = {
     API_VERSION: "V2",
     SANDBOX_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/developer-portal",
-    PRODUCTION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/core"
+    PRODUCTION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/core",
+    SIMULATION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/simulation",
 }
 
 interface ComplianceAPIInterface {
@@ -61,7 +62,7 @@ class API {
 
     baseUrl;
     constructor (isProduction: boolean = false) {
-        this.baseUrl = isProduction? settings.PRODUCTION_BASEURL : settings.SANDBOX_BASEURL;
+        this.baseUrl = isProduction? settings.PRODUCTION_BASEURL : settings.SIMULATION_BASEURL;
     }
 
     private getAuthHeaders = (certificate?: string, secret?: string): any => {
