@@ -6,7 +6,7 @@ const settings = {
     API_VERSION: "V2",
     SANDBOX_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/developer-portal",
     PRODUCTION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/core",
-    SIMULATION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/simulation",
+    SIMULATION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/simulation", // Testing on Production
 }
 
 interface ComplianceAPIInterface {
@@ -16,15 +16,15 @@ interface ComplianceAPIInterface {
      * @param otp String Tax payer provided OTP from Fatoora portal
      * @returns issued_certificate: string, api_secret: string, or throws on error.
      */
-    issueCertificate: (csr: string, otp: string) => Promise<{issued_certificate: string, api_secret: string, request_id: string}>
+    issueCertificate: (csr: string, otp: string) => Promise<{ issued_certificate: string, api_secret: string, request_id: string }>
 
-     /**
-     * Checks compliance of a signed ZATCA XML.
-     * @param signed_xml_string String.
-     * @param invoice_hash String.
-     * @param egs_uuid String.
-     * @returns Any status.
-     */
+    /**
+    * Checks compliance of a signed ZATCA XML.
+    * @param signed_xml_string String.
+    * @param invoice_hash String.
+    * @param egs_uuid String.
+    * @returns Any status.
+    */
     checkInvoiceCompliance: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
 }
 
@@ -35,34 +35,47 @@ interface ProductionAPIInterface {
      * @param compliance_request_id String compliance_request_id
      * @returns issued_certificate: string, api_secret: string, or throws on error.
      */
-    issueCertificate: (compliance_request_id: string) => Promise<{issued_certificate: string, api_secret: string, request_id: string}>
+    issueCertificate: (compliance_request_id: string) => Promise<{ issued_certificate: string, api_secret: string, request_id: string }>
 
-     /**
-     * Report signed ZATCA XML.
-     * @param signed_xml_string String.
-     * @param invoice_hash String.
-     * @param egs_uuid String.
-     * @returns Any status.
-     */
-      reportInvoice: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
+    /**
+    * Report signed ZATCA XML.
+    * @param signed_xml_string String.
+    * @param invoice_hash String.
+    * @param egs_uuid String.
+    * @returns Any status.
+    */
+    reportInvoice: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
 
-     /**
-     * Clear Standard Invoice signed ZATCA XML.
-     * @param signed_xml_string String.
-     * @param invoice_hash String.
-     * @param egs_uuid String.
-     * @returns Any status.
-     */
-        clearInvoice: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
+    /**
+    * Clear Standard Invoice signed ZATCA XML.
+    * @param signed_xml_string String.
+    * @param invoice_hash String.
+    * @param egs_uuid String.
+    * @returns Any status.
+    */
+    clearInvoice: (signed_xml_string: string, invoice_hash: string, egs_uuid: string) => Promise<any>
 
 }
 
 
 class API {
 
-    baseUrl;
-    constructor (isProduction: boolean = false) {
-        this.baseUrl = isProduction? settings.PRODUCTION_BASEURL : settings.SIMULATION_BASEURL;
+    baseUrl = settings.SANDBOX_BASEURL;
+
+    constructor(isProduction: number = 0) {
+        switch (isProduction) {
+            case 1:
+                this.baseUrl = settings.PRODUCTION_BASEURL;
+                break;
+            case 2:
+                this.baseUrl = settings.SIMULATION_BASEURL;
+                break;
+
+            default:
+                this.baseUrl = settings.SANDBOX_BASEURL;
+                break;
+        }
+        
     }
 
     private getAuthHeaders = (certificate?: string, secret?: string): any => {
@@ -71,7 +84,7 @@ class API {
             const certificate_stripped = cleanUpCertificateString(certificate);
             const basic = Buffer.from(`${Buffer.from(certificate_stripped).toString("base64")}:${secret}`).toString("base64");
             return {
-                "Authorization": `Basic ${basic}`   
+                "Authorization": `Basic ${basic}`
             };
         }
         return {};
@@ -80,24 +93,24 @@ class API {
     compliance(certificate?: string, secret?: string): ComplianceAPIInterface {
         const auth_headers = this.getAuthHeaders(certificate, secret);
 
-        const issueCertificate = async (csr: string, otp: string): Promise<{issued_certificate: string, api_secret: string, request_id: string}> => {
+        const issueCertificate = async (csr: string, otp: string): Promise<{ issued_certificate: string, api_secret: string, request_id: string }> => {
             const headers = {
                 "Accept-Version": settings.API_VERSION,
                 OTP: otp
             };
 
             const response = await axios.post(`${this.baseUrl}/compliance`,
-                {csr: Buffer.from(csr).toString("base64")},
-                {headers: {...auth_headers, ...headers}}
+                { csr: Buffer.from(csr).toString("base64") },
+                { headers: { ...auth_headers, ...headers } }
             );
-                        
+
             if (response.status != 200) throw new Error("Error issuing a compliance certificate.");
 
             let issued_certificate = new Buffer(response.data.binarySecurityToken, "base64").toString();
             issued_certificate = `-----BEGIN CERTIFICATE-----\n${issued_certificate}\n-----END CERTIFICATE-----`;
             const api_secret = response.data.secret;
 
-            return {issued_certificate, api_secret, request_id: response.data.requestID};
+            return { issued_certificate, api_secret, request_id: response.data.requestID };
         }
 
         const checkInvoiceCompliance = async (signed_xml_string: string, invoice_hash: string, egs_uuid: string): Promise<any> => {
@@ -112,13 +125,13 @@ class API {
                     uuid: egs_uuid,
                     invoice: Buffer.from(signed_xml_string).toString("base64")
                 },
-                {headers: {...auth_headers, ...headers}}
+                { headers: { ...auth_headers, ...headers } }
             );
-                        
+
             if (response.status != 200) throw new Error("Error in compliance check.");
             return response.data;
         }
-        
+
         return {
             issueCertificate,
             checkInvoiceCompliance
@@ -129,23 +142,23 @@ class API {
     production(certificate?: string, secret?: string): ProductionAPIInterface {
         const auth_headers = this.getAuthHeaders(certificate, secret);
 
-        const issueCertificate = async (compliance_request_id: string): Promise<{issued_certificate: string, api_secret: string, request_id: string}> => {
+        const issueCertificate = async (compliance_request_id: string): Promise<{ issued_certificate: string, api_secret: string, request_id: string }> => {
             const headers = {
                 "Accept-Version": settings.API_VERSION
             };
 
             const response = await axios.post(`${this.baseUrl}/production/csids`,
-                {compliance_request_id: compliance_request_id},
-                {headers: {...auth_headers, ...headers}}
+                { compliance_request_id: compliance_request_id },
+                { headers: { ...auth_headers, ...headers } }
             );
-                        
+
             if (response.status != 200) throw new Error("Error issuing a production certificate.");
 
             let issued_certificate = new Buffer(response.data.binarySecurityToken, "base64").toString();
             issued_certificate = `-----BEGIN CERTIFICATE-----\n${issued_certificate}\n-----END CERTIFICATE-----`;
             const api_secret = response.data.secret;
 
-            return {issued_certificate, api_secret, request_id: response.data.requestID};
+            return { issued_certificate, api_secret, request_id: response.data.requestID };
         }
 
         const reportInvoice = async (signed_xml_string: string, invoice_hash: string, egs_uuid: string): Promise<any> => {
@@ -161,9 +174,9 @@ class API {
                     uuid: egs_uuid,
                     invoice: Buffer.from(signed_xml_string).toString("base64")
                 },
-                {headers: {...auth_headers, ...headers}}
+                { headers: { ...auth_headers, ...headers } }
             );
-                        
+
             if (response.status != 200) throw new Error("Error in reporting invoice.");
             return response.data;
         }
@@ -181,9 +194,9 @@ class API {
                     uuid: egs_uuid,
                     invoice: Buffer.from(signed_xml_string).toString("base64")
                 },
-                {headers: {...auth_headers, ...headers}}
+                { headers: { ...auth_headers, ...headers } }
             );
-                        
+
             if (response.status != 200) throw new Error("Error in reporting invoice.");
             return response.data;
         }
@@ -195,7 +208,7 @@ class API {
             clearInvoice
         }
     }
-  
+
 
 }
 
