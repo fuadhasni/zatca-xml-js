@@ -107,7 +107,7 @@ export interface ZATCASimplifiedInvoiceLineItem {
 }
 
 export interface ZATCASimplifiedInvoicCancelation{
-    canceled_invoice_number: number,
+    canceled_invoice_number: string,
     payment_method: ZATCAPaymentMethods,
     cancelation_type: ZATCAInvoiceTypes,
     reason: string

@@ -7,7 +7,7 @@ const template = /* XML */`
 
 
 export default function populate(
-    invoice_number: number
+    invoice_number: string
 ): string {
     let populated_template = template;
     populated_template = populated_template.replace("SET_INVOICE_NUMBER", `${invoice_number}`);
