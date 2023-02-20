@@ -19,7 +19,7 @@ distinguished_name = my_req_dn_prompt
 req_extensions = v3_req
 
 [ v3_req ]
-basicConstraints=CA:FALSE
+#basicConstraints=CA:FALSE
 #keyUsage = digitalSignature, keyEncipherment
 # Production or Testing Template (TSTZATCA-Code-Signing - ZATCA-Code-Signing)
 1.3.6.1.4.1.311.20.2 = ASN1:UTF8String:SET_PRODUCTION_VALUE
