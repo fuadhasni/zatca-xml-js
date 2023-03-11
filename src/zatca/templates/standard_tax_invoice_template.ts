@@ -27,7 +27,7 @@ const template = /* XML */`
     <cbc:UUID>SET_TERMINAL_UUID</cbc:UUID>
     <cbc:IssueDate>SET_ISSUE_DATE</cbc:IssueDate>
     <cbc:IssueTime>SET_ISSUE_TIME</cbc:IssueTime>
-    <cbc:InvoiceTypeCode name="0111010">SET_INVOICE_TYPE</cbc:InvoiceTypeCode>
+    <cbc:InvoiceTypeCode name="0100000">SET_INVOICE_TYPE</cbc:InvoiceTypeCode>
     <cbc:DocumentCurrencyCode>SAR</cbc:DocumentCurrencyCode>
     <cbc:TaxCurrencyCode>SAR</cbc:TaxCurrencyCode>
     SET_BILLING_REFERENCE
