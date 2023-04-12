@@ -1,7 +1,7 @@
 import { XMLDocument } from "../parser";
 import { generateSignedXMLString } from "./signing";
 import {
-    ZATCASimplifiedInvoiceLineItem,    
+    ZATCASimplifiedInvoiceLineItem,
     ZATCAInvoiceTypes,
     ZATCAPaymentMethods
 } from "./templates/simplified_tax_invoice_template";
@@ -14,9 +14,10 @@ declare global {
     }
 }
 
-Number.prototype.toFixedNoRounding = function(n: number) {
-    const reg = new RegExp("^-?\\d+(?:\\.\\d{0," + n + "})?", "g")
-    let m = this.toString().match(reg);
+Number.prototype.toFixedNoRounding = function (n: number) {
+    const reg = new RegExp("^-?\\d+(?:\\.\\d{0," + n + "})?", "g");
+    let x = Math.round((Number(this) + Number.EPSILON) * 100) / 100; //added rounding, zatca returns error without rouding
+    let m = x.toString().match(reg);
     if (m?.length) {
         const a = m[0];
         const dot = a.indexOf(".");
@@ -29,7 +30,7 @@ Number.prototype.toFixedNoRounding = function(n: number) {
     return "0.00";
 }
 
-export {ZATCASimplifiedInvoiceLineItem, ZATCAStandardInvoiceProps, ZATCAInvoiceTypes, ZATCAPaymentMethods, ZATCAStandardInvoiceCustomer};
+export { ZATCASimplifiedInvoiceLineItem, ZATCAStandardInvoiceProps, ZATCAInvoiceTypes, ZATCAPaymentMethods, ZATCAStandardInvoiceCustomer };
 export class ZATCAStandardTaxInvoice {
 
     private invoice_xml: XMLDocument;
@@ -39,7 +40,7 @@ export class ZATCAStandardTaxInvoice {
      * @param invoice_xml_str Invoice XML string to parse.
      * @param props ZATCASimplifiedInvoiceProps props to create a new unsigned invoice.
      */
-    constructor({invoice_xml_str, props}: {invoice_xml_str?: string, props?: ZATCAStandardInvoiceProps}) {
+    constructor({ invoice_xml_str, props }: { invoice_xml_str?: string, props?: ZATCAStandardInvoiceProps }) {
 
         if (invoice_xml_str) {
             this.invoice_xml = new XMLDocument(invoice_xml_str);
@@ -75,7 +76,7 @@ export class ZATCAStandardTaxInvoice {
             }
         };
         cacClassifiedTaxCategories.push(VAT);
-        
+
         // Calc total discounts
         line_item.discounts?.map((discount) => {
             line_item_total_discounts += discount.amount;
@@ -90,9 +91,9 @@ export class ZATCAStandardTaxInvoice {
             });
         });
 
-         
+
         // Calc item subtotal
-        let line_item_subtotal = 
+        let line_item_subtotal =
             (line_item.tax_exclusive_price * line_item.quantity) - line_item_total_discounts;
         line_item_subtotal = parseFloat(line_item_subtotal.toFixedNoRounding(2))
 
@@ -108,7 +109,7 @@ export class ZATCAStandardTaxInvoice {
                 "cbc:Percent": (tax.percent_amount * 100).toFixedNoRounding(2),
                 "cac:TaxScheme": {
                     "cbc:ID": "VAT"
-                }        
+                }
             })
         });
 
@@ -120,13 +121,13 @@ export class ZATCAStandardTaxInvoice {
             },
             "cbc:RoundingAmount": {
                 "@_currencyID": "SAR",
-                "#text":  (parseFloat(line_item_subtotal.toFixedNoRounding(2)) + parseFloat(line_item_total_taxes.toFixedNoRounding(2))).toFixed(2)
+                "#text": (parseFloat(line_item_subtotal.toFixedNoRounding(2)) + parseFloat(line_item_total_taxes.toFixedNoRounding(2))).toFixed(2)
             }
         };
 
 
         return {
-            cacAllowanceCharges, 
+            cacAllowanceCharges,
             cacClassifiedTaxCategories, cacTaxTotal,
             line_item_total_tax_exclusive: line_item_subtotal,
             line_item_total_taxes,
@@ -136,7 +137,7 @@ export class ZATCAStandardTaxInvoice {
 
 
     private constructLineItem = (line_item: ZATCASimplifiedInvoiceLineItem) => {
-        
+
         const {
             cacAllowanceCharges,
             cacClassifiedTaxCategories, cacTaxTotal,
@@ -146,41 +147,41 @@ export class ZATCAStandardTaxInvoice {
         } = this.constructLineItemTotals(line_item);
 
         return {
-                line_item_xml: {
-                    "cbc:ID": line_item.id,
-                    "cbc:InvoicedQuantity": {
-                        "@_unitCode": "PCE",
-                        "#text": line_item.quantity
-                    },
-                    // BR-DEC-23
-                    "cbc:LineExtensionAmount": {
-                        "@_currencyID": "SAR",
-                        "#text": line_item_total_tax_exclusive.toFixedNoRounding(2)
-                    },
-                    "cac:TaxTotal": cacTaxTotal,
-                    "cac:Item": {
-                        "cbc:Name": line_item.name,
-                        "cac:ClassifiedTaxCategory": cacClassifiedTaxCategories
-                    },
-                    "cac:Price": {
-                        "cbc:PriceAmount": {
-                            "@_currencyID": "SAR",
-                            "#text": line_item.tax_exclusive_price
-                        },
-                        "cac:AllowanceCharge": cacAllowanceCharges
-                    }
+            line_item_xml: {
+                "cbc:ID": line_item.id,
+                "cbc:InvoicedQuantity": {
+                    "@_unitCode": "PCE",
+                    "#text": line_item.quantity
                 },
-                line_item_totals: {
-                    taxes_total: line_item_total_taxes,
-                    discounts_total: line_item_total_discounts,
-                    subtotal: line_item_total_tax_exclusive
+                // BR-DEC-23
+                "cbc:LineExtensionAmount": {
+                    "@_currencyID": "SAR",
+                    "#text": line_item_total_tax_exclusive.toFixedNoRounding(2)
+                },
+                "cac:TaxTotal": cacTaxTotal,
+                "cac:Item": {
+                    "cbc:Name": line_item.name,
+                    "cac:ClassifiedTaxCategory": cacClassifiedTaxCategories
+                },
+                "cac:Price": {
+                    "cbc:PriceAmount": {
+                        "@_currencyID": "SAR",
+                        "#text": line_item.tax_exclusive_price
+                    },
+                    "cac:AllowanceCharge": cacAllowanceCharges
                 }
-            };
+            },
+            line_item_totals: {
+                taxes_total: line_item_total_taxes,
+                discounts_total: line_item_total_discounts,
+                subtotal: line_item_total_tax_exclusive
+            }
+        };
     }
 
 
     private constructLegalMonetaryTotal = (tax_exclusive_subtotal: number, taxes_total: number) => {
-        
+
         return {
             // BR-DEC-09
             "cbc:LineExtensionAmount": {
@@ -247,10 +248,10 @@ export class ZATCAStandardTaxInvoice {
                 }
             });
         }
-        
+
         let taxes_total = 0;
         line_items.map((line_item) => {
-            const total_line_item_discount = line_item.discounts?.reduce((p, c) => p+c.amount, 0);
+            const total_line_item_discount = line_item.discounts?.reduce((p, c) => p + c.amount, 0);
             const taxable_amount = (line_item.tax_exclusive_price * line_item.quantity) - (total_line_item_discount ?? 0);
 
             let tax_amount = line_item.VAT_percent * taxable_amount;
@@ -287,25 +288,25 @@ export class ZATCAStandardTaxInvoice {
     }
 
     private parseLineItems(line_items: ZATCASimplifiedInvoiceLineItem[], props: ZATCAStandardInvoiceProps) {
-        
+
         let total_taxes: number = 0;
         let total_subtotal: number = 0;
 
         let invoice_line_items: any[] = [];
         line_items.map((line_item) => {
-            const {line_item_xml, line_item_totals} = this.constructLineItem(line_item);
-            
+            const { line_item_xml, line_item_totals } = this.constructLineItem(line_item);
+
             total_taxes += parseFloat(line_item_totals.taxes_total.toFixedNoRounding(2));
             total_subtotal += parseFloat(line_item_totals.subtotal.toFixedNoRounding(2));
 
-            invoice_line_items.push(line_item_xml);          
+            invoice_line_items.push(line_item_xml);
         });
 
         // BT-110
         total_taxes = parseFloat(total_taxes.toFixed(2))
         total_subtotal = parseFloat(total_subtotal.toFixed(2))
 
-        if(props.cancelation) {
+        if (props.cancelation) {
             // Invoice canceled. Tunred into credit/debit note. Must have PaymentMeans
             // BR-KSA-17
             this.invoice_xml.set("Invoice/cac:PaymentMeans", false, {
@@ -313,7 +314,7 @@ export class ZATCAStandardTaxInvoice {
                 "cbc:InstructionNote": props.cancelation.reason ?? "No note Specified"
             });
         }
-        
+
         this.invoice_xml.set("Invoice/cac:TaxTotal", false, this.constructTaxTotal(line_items));
 
         this.invoice_xml.set("Invoice/cac:LegalMonetaryTotal", true, this.constructLegalMonetaryTotal(
@@ -322,9 +323,9 @@ export class ZATCAStandardTaxInvoice {
         ));
 
         invoice_line_items.map((line_item) => {
-            this.invoice_xml.set("Invoice/cac:InvoiceLine", false, line_item);  
+            this.invoice_xml.set("Invoice/cac:InvoiceLine", false, line_item);
         });
-        
+
     }
 
     getXML(): XMLDocument {
