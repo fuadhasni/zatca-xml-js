@@ -75,16 +75,18 @@ const template = /* XML */`
 
 // 11.2.5 Payment means type code
 export enum ZATCAPaymentMethods {
-    CASH="10",
-    CREDIT="30",
-    BANK_ACCOUNT="42",
-    BANK_CARD="48"
+    CASH = "10",
+    CREDIT = "30",
+    BANK_ACCOUNT = "42",
+    BANK_CARD = "48",
+    OTHER = '1'
+
 }
 
-export enum ZATCAInvoiceTypes{
-    INVOICE="388",
-    DEBIT_NOTE="383",
-    CREDIT_NOTE="381"
+export enum ZATCAInvoiceTypes {
+    INVOICE = "388",
+    DEBIT_NOTE = "383",
+    CREDIT_NOTE = "381"
 }
 
 export interface ZATCASimplifiedInvoiceLineItemDiscount {
@@ -106,7 +108,7 @@ export interface ZATCASimplifiedInvoiceLineItem {
     VAT_percent: number,
 }
 
-export interface ZATCASimplifiedInvoicCancelation{
+export interface ZATCASimplifiedInvoicCancelation {
     canceled_invoice_number: string,
     payment_method: ZATCAPaymentMethods,
     cancelation_type: ZATCAInvoiceTypes,
@@ -129,7 +131,7 @@ export default function populate(props: ZATCASimplifiedInvoiceProps): string {
 
     populated_template = populated_template.replace("SET_INVOICE_TYPE", props.cancelation ? props.cancelation.cancelation_type : ZATCAInvoiceTypes.INVOICE);
     // if canceled (BR-KSA-56) set reference number to canceled invoice
-    if(props.cancelation) {
+    if (props.cancelation) {
         populated_template = populated_template.replace("SET_BILLING_REFERENCE", defaultBillingReference(props.cancelation.canceled_invoice_number));
     } else {
         populated_template = populated_template.replace("SET_BILLING_REFERENCE", "");
