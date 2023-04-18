@@ -14,9 +14,9 @@ declare global {
 }
 
 Number.prototype.toFixedNoRounding = function (n: number) {
-    n = Math.round((n + Number.EPSILON) * 100) / 100;
-    const reg = new RegExp("^-?\\d+(?:\\.\\d{0," + n + "})?", "g")
-    let m = this.toString().match(reg);
+    const reg = new RegExp("^-?\\d+(?:\\.\\d{0," + n + "})?", "g");
+    let x = Math.round((Number(this) + Number.EPSILON) * 100) / 100; //added rounding, zatca returns error without rouding
+    let m = x.toString().match(reg);
     if (m?.length) {
         const a = m[0];
         const dot = a.indexOf(".");

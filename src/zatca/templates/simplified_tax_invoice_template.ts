@@ -79,7 +79,7 @@ export enum ZATCAPaymentMethods {
     CREDIT = "30",
     BANK_ACCOUNT = "42",
     BANK_CARD = "48",
-    OTHER = '1'
+    OTHER = "1"
 
 }
 
