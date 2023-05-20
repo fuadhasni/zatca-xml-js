@@ -75,7 +75,7 @@ class API {
                 this.baseUrl = settings.SANDBOX_BASEURL;
                 break;
         }
-        
+
     }
 
     private getAuthHeaders = (certificate?: string, secret?: string): any => {
@@ -128,8 +128,12 @@ class API {
                 { headers: { ...auth_headers, ...headers } }
             );
 
-            if (response.status != 200) throw new Error("Error in compliance check.");
-            return response.data;
+
+            if (response.status >= 200 && response.status < 300) {
+                return response.data
+            } else {
+                throw new Error("Error in compliance check.");
+            }
         }
 
         return {
@@ -177,8 +181,12 @@ class API {
                 { headers: { ...auth_headers, ...headers } }
             );
 
-            if (response.status != 200) throw new Error("Error in reporting invoice.");
-            return response.data;
+
+            if (response.status >= 200 && response.status < 300) {
+                return response.data
+            } else {
+                throw new Error("Error in reporting invoice.");
+            }
         }
 
         const clearInvoice = async (signed_xml_string: string, invoice_hash: string, egs_uuid: string): Promise<any> => {
@@ -197,8 +205,11 @@ class API {
                 { headers: { ...auth_headers, ...headers } }
             );
 
-            if (response.status != 200) throw new Error("Error in reporting invoice.");
-            return response.data;
+            if (response.status >= 200 && response.status < 300) {
+                return response.data
+            } else {
+                throw new Error("Error in reporting invoice.");
+            }
         }
 
 
