@@ -4,7 +4,7 @@ import { cleanUpCertificateString } from "../signing";
 
 const settings = {
     API_VERSION: "V2",
-    SANDBOX_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/developer-portal",
+    SANDBOX_BASEURL: "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal",
     PRODUCTION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/core",
     SIMULATION_BASEURL: "https://gw-apic-gov.gazt.gov.sa/e-invoicing/simulation", // Testing on Production
 }
