@@ -11,12 +11,13 @@ const line_item: ZATCASimplifiedInvoiceLineItem = {
     tax_exclusive_price: 10,
     VAT_percent: 0.15,
     other_taxes: [
-        {percent_amount: 1}
+        { percent_amount: 1 }
     ],
     discounts: [
-        {amount: 2, reason: "A discount"},
-        {amount: 2, reason: "A second discount"}
-    ]
+        { amount: 2, reason: "A discount" },
+        { amount: 2, reason: "A second discount" }
+    ],
+    VAT_exemption_reason: ""
 };
 
 // Sample EGSUnit
@@ -74,17 +75,17 @@ const main = async () => {
         const compliance_request_id = await egs.issueComplianceCertificate("123345");
 
         // Sign invoice
-        const {signed_invoice_string, invoice_hash, qr} = egs.signInvoice(invoice);
+        const { signed_invoice_string, invoice_hash, qr } = egs.signInvoice(invoice);
 
         // Check invoice compliance
-        console.log( await egs.checkInvoiceCompliance(signed_invoice_string, invoice_hash) );
+        console.log(await egs.checkInvoiceCompliance(signed_invoice_string, invoice_hash));
 
         // Issue production certificate
         const production_request_id = await egs.issueProductionCertificate(compliance_request_id);
-        
-         // Report invoice production
-         // Note: This request currently fails because ZATCA sandbox returns a constant fake production certificate
-        console.log( await egs.reportInvoice(signed_invoice_string, invoice_hash) );
+
+        // Report invoice production
+        // Note: This request currently fails because ZATCA sandbox returns a constant fake production certificate
+        console.log(await egs.reportInvoice(signed_invoice_string, invoice_hash));
 
 
     } catch (error: any) {
