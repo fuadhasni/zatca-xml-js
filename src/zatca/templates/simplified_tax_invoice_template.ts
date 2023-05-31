@@ -106,6 +106,7 @@ export interface ZATCASimplifiedInvoiceLineItem {
     other_taxes?: ZATCASimplifiedInvoiceLineItemTax[],
     discounts?: ZATCASimplifiedInvoiceLineItemDiscount[]
     VAT_percent: number,
+    VAT_exemption_reason: string
 }
 
 export interface ZATCASimplifiedInvoicCancelation {

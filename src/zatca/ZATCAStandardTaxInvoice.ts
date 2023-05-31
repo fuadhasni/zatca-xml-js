@@ -218,7 +218,7 @@ export class ZATCAStandardTaxInvoice {
 
         const cacTaxSubtotal: any[] = [];
         // BR-DEC-13, MESSAGE : [BR-DEC-13]-The allowed maximum number of decimals for the Invoice total VAT amount (BT-110) is 2.
-        const addTaxSubtotal = (taxable_amount: number, tax_amount: number, tax_percent: number) => {
+        const addTaxSubtotal = (taxable_amount: number, tax_amount: number, tax_percent: number, tax_exemption_reason: string) => {
             cacTaxSubtotal.push({
                 // BR-DEC-19
                 "cbc:TaxableAmount": {
@@ -237,7 +237,7 @@ export class ZATCAStandardTaxInvoice {
                     },
                     "cbc:Percent": (tax_percent * 100).toFixedNoRounding(2),
                     // BR-O-10
-                    "cbc:TaxExemptionReason": tax_percent ? undefined : "Not subject to VAT",
+                    "cbc:TaxExemptionReason": tax_percent ? undefined : tax_exemption_reason,
                     "cac:TaxScheme": {
                         "cbc:ID": {
                             "@_schemeAgencyID": "6",
@@ -255,11 +255,11 @@ export class ZATCAStandardTaxInvoice {
             const taxable_amount = (line_item.tax_exclusive_price * line_item.quantity) - (total_line_item_discount ?? 0);
 
             let tax_amount = line_item.VAT_percent * taxable_amount;
-            addTaxSubtotal(taxable_amount, tax_amount, line_item.VAT_percent);
+            addTaxSubtotal(taxable_amount, tax_amount, line_item.VAT_percent, line_item.VAT_exemption_reason || 'Not Subject To VAT');
             taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
             line_item.other_taxes?.map((tax) => {
                 tax_amount = tax.percent_amount * taxable_amount;
-                addTaxSubtotal(taxable_amount, tax_amount, tax.percent_amount);
+                addTaxSubtotal(taxable_amount, tax_amount, tax.percent_amount, line_item.VAT_exemption_reason || 'Not Subject To VAT');
                 taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
             });
         });
