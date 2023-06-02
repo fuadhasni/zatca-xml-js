@@ -251,7 +251,7 @@ export class ZATCAStandardTaxInvoice {
                     "cbc:ID": {
                         "@_schemeAgencyID": 6,
                         "@_schemeID": "UN/ECE 5305",
-                        "#text": tax_percent ? "S" : this.getTaxCategoryCode(tax_exemption_reason)
+                        "#text": tax_percent ? "S" : this.getTaxCategoryCode(tax_exemption_reason).value
                     },
                     "cbc:Percent": (tax_percent * 100).toFixedNoRounding(2),
                     // BR-O-10
