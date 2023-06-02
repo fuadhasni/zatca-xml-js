@@ -1,4 +1,5 @@
 import { XMLDocument } from "../parser";
+import { codes } from "../utils/vatCategoriesCodes";
 import { generateSignedXMLString } from "./signing";
 import defaultSimplifiedTaxInvoice, {
     ZATCASimplifiedInvoiceLineItem,
@@ -217,6 +218,24 @@ export class ZATCASimplifiedTaxInvoice {
         }
     }
 
+    private getTaxCategoryCode = (exemption_reason: string) => {
+        let returnCode: {
+            code: string | undefined,
+            value: string
+        } = {
+            code: undefined,
+            value: 'O'
+        } // Services outside scope of tax / Not subject to VAT
+
+        codes.forEach(doc => {
+            if (exemption_reason.includes(doc.code)) {
+                returnCode = doc
+            }
+        });
+        return returnCode;
+    }
+
+
     private constructTaxTotal = (line_items: ZATCASimplifiedInvoiceLineItem[]) => {
 
         const cacTaxSubtotal: any[] = [];
@@ -236,11 +255,12 @@ export class ZATCASimplifiedTaxInvoice {
                     "cbc:ID": {
                         "@_schemeAgencyID": 6,
                         "@_schemeID": "UN/ECE 5305",
-                        "#text": tax_percent ? "S" : "O"
+                        "#text": tax_percent ? "S" : this.getTaxCategoryCode(tax_exemption_reason).value
                     },
                     "cbc:Percent": (tax_percent * 100).toFixedNoRounding(2),
                     // BR-O-10
                     "cbc:TaxExemptionReason": tax_percent ? undefined : tax_exemption_reason,
+                    "cbc:TaxExemptionReasonCode": this.getTaxCategoryCode(tax_exemption_reason).code,
                     "cac:TaxScheme": {
                         "cbc:ID": {
                             "@_schemeAgencyID": "6",
