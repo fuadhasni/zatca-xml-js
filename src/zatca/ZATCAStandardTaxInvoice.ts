@@ -214,6 +214,76 @@ export class ZATCAStandardTaxInvoice {
         }
     }
 
+    private getTaxCategoryCode = (exemption_reason: string) => {
+        let returnCode = 'O'; // Services outside scope of tax / Not subject to VAT
+
+        const codes = [
+            {
+                code: 'VATEX-SA-29',
+                value: 'E' // Exempt from TAX, 11.2.4 VAT categories code
+            },
+            {
+                code: 'VATEX-SA-29-7',
+                value: 'E'
+            },
+            {
+                code: 'VATEX-SA-30',
+                value: 'E'
+            },
+            {
+                code: 'VATEX-SA-32',
+                value: 'Z' // Zero rated goods
+            },
+            {
+                code: 'VATEX-SA-33',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-34-1',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-34-2',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-34-3',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-34-4',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-34-5',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-35',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-36',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-EDU',
+                value: 'Z'
+            },
+            {
+                code: 'VATEX-SA-HEA',
+                value: 'Z'
+            }
+        ];
+
+        codes.forEach(doc => {
+            if (exemption_reason.includes(doc.code)) {
+                returnCode = doc.value;
+            }
+        });
+        return returnCode;
+    }
+
     private constructTaxTotal = (line_items: ZATCASimplifiedInvoiceLineItem[]) => {
 
         const cacTaxSubtotal: any[] = [];
@@ -233,7 +303,7 @@ export class ZATCAStandardTaxInvoice {
                     "cbc:ID": {
                         "@_schemeAgencyID": 6,
                         "@_schemeID": "UN/ECE 5305",
-                        "#text": tax_percent ? "S" : "O"
+                        "#text": tax_percent ? "S" : this.getTaxCategoryCode(tax_exemption_reason)
                     },
                     "cbc:Percent": (tax_percent * 100).toFixedNoRounding(2),
                     // BR-O-10
