@@ -1,4 +1,4 @@
-import { ZATCAStandardInvoiceCustomer } from "./standard_tax_invoice_template"; 
+import { ZATCAStandardInvoiceCustomer } from "./standard_tax_invoice_template";
 const template = /* XML */`
 <cac:AccountingCustomerParty>
         <cac:Party>
@@ -8,14 +8,14 @@ const template = /* XML */`
             <cac:PostalAddress>
                 <cbc:StreetName>SET_CUSTOMER_STREET</cbc:StreetName>
                 <cbc:AdditionalStreetName>-</cbc:AdditionalStreetName>
-                <cbc:BuildingNumber>0000</cbc:BuildingNumber>
-                <cbc:PlotIdentification>0000</cbc:PlotIdentification>
+                <cbc:BuildingNumber>SET_CUSTOMER_BUILDING_NUMBER</cbc:BuildingNumber>
+                <cbc:PlotIdentification>SET_CUSTOMER_PLOT_IDENTIFICATION</cbc:PlotIdentification>
                 <cbc:CitySubdivisionName>SET_CUSTOMER_CITY_SUB_DIVISION_NAME</cbc:CitySubdivisionName>
                 <cbc:CityName>SET_CUSTOMER_CITY_NAME</cbc:CityName>
                 <cbc:PostalZone>SET_CUSTOMER_POSTAL_CODE</cbc:PostalZone>
-                <cbc:CountrySubentity>-</cbc:CountrySubentity>
+                <cbc:CountrySubentity>SET_CUSTOMER_SUB_ENTITY</cbc:CountrySubentity>
                 <cac:Country>
-                    <cbc:IdentificationCode>SA</cbc:IdentificationCode>
+                    <cbc:IdentificationCode>SET_CUSTOMER_COUNTRY_CODE</cbc:IdentificationCode>
                 </cac:Country>
             </cac:PostalAddress>
             <cac:PartyTaxScheme>
@@ -44,6 +44,10 @@ export default function populate(
     populated_template = populated_template.replace("SET_CUSTOMER_CITY_NAME", `${customer.city}`);
     populated_template = populated_template.replace("SET_CUSTOMER_POSTAL_CODE", `${customer.postcode}`);
     populated_template = populated_template.replace("SET_CUSTOMER_CRN", `${customer.crn || '000'}`);
+    populated_template = populated_template.replace("SET_CUSTOMER_BUILDING_NUMBER", `${customer.building_number || '0000'}`);
+    populated_template = populated_template.replace("SET_CUSTOMER_PLOT_IDENTIFICATION", `${customer.plot_Identification || '0000'}`);
+    populated_template = populated_template.replace("SET_CUSTOMER_SUB_ENTITY", `${customer.country_subentity || '-'}`);
+    populated_template = populated_template.replace("SET_CUSTOMER_COUNTRY_CODE", `${customer.country || 'SA'}`);
     /** TODO replace hardcoded values with replace */
     return populated_template;
 };
