@@ -29,13 +29,14 @@ const template = /* XML */`
         </cac:Party>
     </cac:AccountingCustomerParty>
     <cac:Delivery>
-        <cbc:ActualDeliveryDate>2022-03-13</cbc:ActualDeliveryDate>
-        <cbc:LatestDeliveryDate>2023-01-27</cbc:LatestDeliveryDate>
+        <cbc:ActualDeliveryDate>SET_ACTUAL_DELIVERY_DATE</cbc:ActualDeliveryDate>
+        <cbc:LatestDeliveryDate>SET_LATEST_DELIVERY_DATE</cbc:LatestDeliveryDate>
     </cac:Delivery>`;
 
 
 export default function populate(
-    customer: ZATCAStandardInvoiceCustomer
+    customer: ZATCAStandardInvoiceCustomer,
+    date: string
 ): string {
     let populated_template = template;
     populated_template = populated_template.replace("SET_CUSTOMER_REGISTERED_NAME", `${customer.registered_name}`);
@@ -48,6 +49,8 @@ export default function populate(
     populated_template = populated_template.replace("SET_CUSTOMER_PLOT_IDENTIFICATION", `${customer.plot_Identification || '0000'}`);
     populated_template = populated_template.replace("SET_CUSTOMER_SUB_ENTITY", `${customer.country_subentity || '-'}`);
     populated_template = populated_template.replace("SET_CUSTOMER_COUNTRY_CODE", `${customer.country || 'SA'}`);
+    populated_template = populated_template.replace("SET_ACTUAL_DELIVERY_DATE", `${date}`);
+    populated_template = populated_template.replace("SET_LATEST_DELIVERY_DATE", `${date}`);
     /** TODO replace hardcoded values with replace */
     return populated_template;
 };
