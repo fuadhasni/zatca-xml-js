@@ -5,7 +5,8 @@
   <br/>
   <br/>
   <p>
-    An implementation of Saudi Arabia ZATCA's E-Invoicing requirements, processes, and standards in TypeScript. <br/>
+    An implementation of Saudi Arabia ZATCA's E-Invoicing requirements, processes, and standards in TypeScript.<br/>
+    This fork adds Standard Invoice, Credit & Debit support to original repo.
   </p>
   Read the <a href="/docs">documentation PDFs</a> or <a href="https://zatca.gov.sa/en/E-Invoicing/SystemsDevelopers/Pages/TechnicalRequirementsSpec.aspx">Systems Developers</a> for more details.
   <br/>
@@ -20,11 +21,6 @@
       <img src="https://badge.fury.io/js/zatca-xml-js.svg/?v=0.1.9"/>
     </a>
   </p>
-  
-  <a href="https://invoicen.io">
-    <p>Check out Invoicen</p>
-    <img src="https://pbs.twimg.com/profile_banners/1575491406969245698/1664461893/1500x500" style="width: 500px" />
-  </a>
 </div>
 
 
@@ -44,10 +40,15 @@ All tha main futures required to on-board a new EGS. Create, sign, and report a 
     - Signing.
     - Compliance checking.
     - Reporting.
+- Standard Tax Invoice.
+    - Creation.
+    - Signing.
+    - Compliance checking.
+    - Clearing. 
 
 # Installation
 ```
-npm install zatca-xml-js
+npm i zatca-xml-js https://github.com/fuadhasni/zatca-xml-js
 ```
 
 # Usage
@@ -75,8 +76,10 @@ const {signed_invoice_string, invoice_hash} = egs.signInvoice(invoice);
 await egs.checkInvoiceCompliance(signed_invoice_string, invoice_hash);
 // Issue production certificate
 await egs.issueProductionCertificate(compliance_rid);
-// Report invoice
+// Report invoice for Simplified Invoice
 await egs.reportInvoice(signed_invoice_string, invoice_hash);
+// Clear invoice for Standard Invoice
+await egs.clearInvoice(signed_invoice_string, invoice_hash);
 ```
 
 # Implementation
@@ -110,9 +113,7 @@ await egs.reportInvoice(signed_invoice_string, invoice_hash);
 All contributions are appreciated.
 
 ## Roadmap
+- Currently CSR includes support for Both Simplified Invoice and Standard invoice, allow user to select which type of CSR is needed.
 - CSIDs renewal, revoking.
 - Populating templates using a template engine instead of `replace`
 - Getting ZATCA to hopefully minify the XMLs before hashing ?
-
-
-I'm not planning on supporting `Tax Invoices` (Not simplified ones). If any one wants to tackle that part.
