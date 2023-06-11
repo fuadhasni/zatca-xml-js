@@ -6,7 +6,7 @@
   <br/>
   <p>
     An implementation of Saudi Arabia ZATCA's E-Invoicing requirements, processes, and standards in TypeScript.<br/>
-    This fork adds Standard Invoice, Credit & Debit support to original repo.
+    <b>This fork adds Standard Invoice, Credit & Debit support to original repo.</b>
   </p>
   Read the <a href="/docs">documentation PDFs</a> or <a href="https://zatca.gov.sa/en/E-Invoicing/SystemsDevelopers/Pages/TechnicalRequirementsSpec.aspx">Systems Developers</a> for more details.
   <br/>
