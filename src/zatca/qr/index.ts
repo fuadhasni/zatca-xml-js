@@ -39,8 +39,9 @@ export const generateQR = ({invoice_xml, digital_signature, public_key, certific
     const invoice_type = invoice_xml.get("Invoice/cbc:InvoiceTypeCode")?.[0]["@_name"].toString();
 
     const datetime = `${issue_date} ${issue_time}`;
-    const formatted_datetime = moment(datetime).format("YYYY-MM-DDTHH:mm:ss")+"Z";
-    
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formatted_datetime = moment(datetime).format("YYYY-MM-DDTHH:mm:ss") + (timezone === "Asia/Riyadh" ? "" : "Z");
+
     const qr_tlv = TLV([
         seller_name,
         VAT_number,

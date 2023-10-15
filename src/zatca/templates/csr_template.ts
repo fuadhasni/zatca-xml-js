@@ -31,7 +31,7 @@ SN = SET_EGS_SERIAL_NUMBER
 # VAT Registration number of TaxPayer (Organization identifier [15 digits begins with 3 and ends with 3])
 UID = SET_VAT_REGISTRATION_NUMBER
 # Invoice type (TSCZ)(1 = supported, 0 not supported) (Tax, Simplified, future use, future use)
-title = 1100
+title = SET_INVOICE_TYPE
 # Location (branch address or website)
 registeredAddress = SET_BRANCH_LOCATION
 # Industry (industry sector name)
@@ -66,7 +66,8 @@ interface CSRConfigProps {
     branch_industry: string,
     branch_name: string,
     taxpayer_name: string,
-    taxpayer_provided_id: string
+    taxpayer_provided_id: string,
+    invoice_type: string,
 
 }
 export default function populate(props: CSRConfigProps): string {
@@ -80,6 +81,7 @@ export default function populate(props: CSRConfigProps): string {
     populated_template = populated_template.replace("SET_COMMON_NAME", props.taxpayer_provided_id);
     populated_template = populated_template.replace("SET_BRANCH_NAME", props.branch_name);
     populated_template = populated_template.replace("SET_TAXPAYER_NAME", props.taxpayer_name);
+    populated_template = populated_template.replace("SET_INVOICE_TYPE", props.invoice_type);
 
     return populated_template;
 };

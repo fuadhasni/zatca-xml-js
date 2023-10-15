@@ -81,19 +81,34 @@ export class ZATCASimplifiedTaxInvoice {
         };
         cacClassifiedTaxCategories.push(VAT);
 
-        // Calc total discounts
-        line_item.discounts?.map((discount) => {
+        const d:any = line_item.discounts?.reduce((acc:any, discount:any) => {
             line_item_total_discounts += discount.amount;
-            cacAllowanceCharges.push({
-                "cbc:ChargeIndicator": "false",
-                "cbc:AllowanceChargeReason": discount.reason,
-                "cbc:Amount": {
-                    "@_currencyID": "SAR",
-                    // BR-DEC-01
-                    "#text": discount.amount.toFixedNoRounding(2)
-                }
-            });
+            acc['cbc:Amount']['#text'] += discount['amount'];
+            return acc
+        }, {
+            "cbc:ChargeIndicator": "true",
+            "cbc:AllowanceChargeReason": "Discount",
+            "cbc:Amount": {
+                "@_currencyID": "SAR",
+                // BR-DEC-01
+                "#text": 0
+            }
         });
+        d['cbc:Amount']['#text'] = parseFloat(d['cbc:Amount']['#text']).toFixedNoRounding(2)
+        cacAllowanceCharges.push(d);
+        // Calc total discounts
+        // line_item.discounts?.map((discount) => {
+        //     line_item_total_discounts += discount.amount;
+        //     cacAllowanceCharges.push({
+        //         "cbc:ChargeIndicator": "false",
+        //         "cbc:AllowanceChargeReason": discount.reason,
+        //         "cbc:Amount": {
+        //             "@_currencyID": "SAR",
+        //             // BR-DEC-01
+        //             "#text": discount.amount.toFixedNoRounding(2)
+        //         }
+        //     });
+        // });
 
 
         // Calc item subtotal
@@ -170,7 +185,11 @@ export class ZATCASimplifiedTaxInvoice {
                 "cac:Price": {
                     "cbc:PriceAmount": {
                         "@_currencyID": "SAR",
-                        "#text": line_item.tax_exclusive_price
+                        "#text": (line_item.tax_exclusive_price * line_item.quantity) - line_item_total_discounts
+                    },
+                    "cbc:BaseQuantity": {
+                        "@_unitCode": "PCE",
+                        "#text": line_item.quantity,
                     },
                     "cac:AllowanceCharge": cacAllowanceCharges
                 }
@@ -218,6 +237,94 @@ export class ZATCASimplifiedTaxInvoice {
         }
     }
 
+    private constructAllowanceCharge = (line_items: ZATCASimplifiedInvoiceLineItem[]) => {
+        interface GroupedByTax {
+            taxesNumber: number;
+            line_items: ZATCASimplifiedInvoiceLineItem[];
+        }
+
+        const groupedByTax: GroupedByTax[] = line_items.reduce((acc: GroupedByTax[], line_item) => {
+            const index = acc.findIndex(({ taxesNumber }) => taxesNumber === line_item.VAT_percent)
+            if (index === -1) {
+                acc.push({
+                    taxesNumber: line_item.VAT_percent,
+                    line_items: [line_item]
+                });
+            } else {
+                acc[index].line_items.push(line_item);
+            }
+            return acc;
+        }, []);
+        console.log("groupedByTax: ", groupedByTax);
+        const t: any[] = groupedByTax.reduce((acc, { taxesNumber, line_items: line_gouped_items }) => {
+            const r:any = line_gouped_items.reduce((acc2, line_item, i) => {
+                const discounts = line_item.discounts?.reduce((acc3, { amount }) => acc3 + amount, 0);
+                acc2["cbc:Amount"]["#text"] += (discounts ?? 0);
+                if (i === line_gouped_items.length - 1) {
+                    acc2["cac:TaxCategory"]["cbc:Percent"] = taxesNumber * 100;
+                }
+                return acc2;
+            }, {
+                "cbc:ChargeIndicator>": "false",
+                "cbc:AllowanceChargeReason": "Discount",
+                "cbc:Amount": {
+                    "@_currencyID": "SAR",
+                    // BR-DEC-01
+                    "#text": 0
+                },
+                "cac:TaxCategory": {
+                    "cbc:ID": {
+                        "#text": "S"
+                    },
+                    "cbc:Percent": 0,
+                    // BR-O-10
+                    "cbc:TaxExemptionReason": "Discount",
+                    "cac:TaxScheme": {
+                        "cbc:ID": {
+                            "#text": "VAT"
+                        }
+                    },
+                },
+            });
+            r["cbc:Amount"]["#text"] = parseFloat(r["cbc:Amount"]["#text"]).toFixedNoRounding(2);
+            r["cac:TaxCategory"]["cbc:Percent"] = parseFloat(r["cac:TaxCategory"]["cbc:Percent"]);
+            acc.push(r);
+            return acc;
+        }, [] as any[]);
+        console.log("t: ", t);
+        return t
+        // return {
+        //     // BR-DEC-09
+        //     "cbc:LineExtensionAmount": {
+        //         "@_currencyID": "SAR",
+        //         "#text": tax_exclusive_subtotal.toFixedNoRounding(2)
+        //     },
+        //     // BR-DEC-12
+        //     "cbc:TaxExclusiveAmount": {
+        //         "@_currencyID": "SAR",
+        //         "#text": tax_exclusive_subtotal.toFixedNoRounding(2)
+        //     },
+        //     // BR-DEC-14, BT-112
+        //     "cbc:TaxInclusiveAmount": {
+        //         "@_currencyID": "SAR",
+        //         "#text": (parseFloat((tax_exclusive_subtotal + taxes_total).toFixed(2)))
+        //     },
+        //     "cbc:AllowanceTotalAmount": {
+        //         "@_currencyID": "SAR",
+        //         "#text": 0
+        //     },
+        //     "cbc:PrepaidAmount": {
+        //         "@_currencyID": "SAR",
+        //         "#text": 0
+        //     },
+        //     // BR-DEC-18, BT-112
+        //     "cbc:PayableAmount": {
+        //         "@_currencyID": "SAR",
+        //         "#text": (parseFloat((tax_exclusive_subtotal + taxes_total).toFixed(2)))
+        //     }
+        // }
+    }
+
     private getTaxCategoryCode = (exemption_reason: string) => {
         let returnCode: {
             code: string | undefined,
@@ -237,7 +344,60 @@ export class ZATCASimplifiedTaxInvoice {
 
 
     private constructTaxTotal = (line_items: ZATCASimplifiedInvoiceLineItem[]) => {
+        // calculate VAT_percent of line_items
+        interface GroupedByTax {
+            taxesNumber: number;
+            line_items: ZATCASimplifiedInvoiceLineItem[];
+        }
 
+        const groupedByTax: GroupedByTax[] = line_items.reduce((acc: GroupedByTax[], line_item) => {
+            const index = acc.findIndex(({ taxesNumber }) => taxesNumber === line_item.VAT_percent)
+            if (index === -1) {
+                acc.push({
+                    taxesNumber: line_item.VAT_percent,
+                    line_items: [line_item]
+                });
+            } else {
+                acc[index].line_items.push(line_item);
+            }
+            return acc;
+        }, []);
+        const t: any[] = groupedByTax.reduce((acc, { taxesNumber, line_items: line_gouped_items }) => {
+            const r = line_gouped_items.reduce((acc2, line_item, i) => {
+                const discounts = line_item.discounts?.reduce((acc3, { amount }) => acc3 + amount, 0);
+                acc2.TaxableAmount += line_item.tax_exclusive_price * line_item.quantity - (discounts ?? 0);
+                if (i === line_gouped_items.length - 1) {
+                    acc2.TaxAmount += acc2.TaxableAmount * taxesNumber;
+                    acc2.Percent = taxesNumber * 100;
+                    line_item.other_taxes?.forEach((tax) => {
+                        acc2.extra.push({
+                            TaxableAmount: acc2.TaxableAmount,
+                            TaxAmount: acc2.TaxableAmount * tax.percent_amount,
+                            Percent: tax.percent_amount * 100,
+                            TaxExemptionReason: ""
+                        });
+                    });
+                }
+                return acc2;
+            }, { TaxableAmount: 0, TaxAmount: 0, Percent: 0, extra: [] as any[] });
+            acc.push(r);
+            return acc;
+        }, [] as any[]);
+        let groupExtraByPerc = t.map(({ extra }) => extra).flat().reduce((acc, { Percent, TaxableAmount, TaxAmount, TaxExemptionReason }) => {
+            const index = acc.findIndex(({ Percent: p }:any) => p === Percent)
+            if (index === -1) {
+                acc.push({
+                    Percent,
+                    TaxableAmount,
+                    TaxAmount,
+                    TaxExemptionReason
+                });
+            } else {
+                acc[index].TaxableAmount += TaxableAmount;
+                acc[index].TaxAmount += TaxAmount;
+            }
+            return acc;
+        }, []);
         const cacTaxSubtotal: any[] = [];
         // BR-DEC-13, MESSAGE : [BR-DEC-13]-The allowed maximum number of decimals for the Invoice total VAT amount (BT-110) is 2.
         const addTaxSubtotal = (taxable_amount: number, tax_amount: number, tax_percent: number, tax_exemption_reason: string) => {
@@ -257,7 +417,7 @@ export class ZATCASimplifiedTaxInvoice {
                         "@_schemeID": "UN/ECE 5305",
                         "#text": tax_percent ? "S" : this.getTaxCategoryCode(tax_exemption_reason).value
                     },
-                    "cbc:Percent": (tax_percent * 100).toFixedNoRounding(2),
+                    "cbc:Percent": (tax_percent).toFixedNoRounding(2),
                     // BR-O-10
                     "cbc:TaxExemptionReason": tax_percent ? undefined : tax_exemption_reason,
                     "cac:TaxScheme": {
@@ -270,25 +430,17 @@ export class ZATCASimplifiedTaxInvoice {
                 }
             });
         }
-
         let taxes_total = 0;
-        line_items.map((line_item) => {
-            const total_line_item_discount = line_item.discounts?.reduce((p, c) => p + c.amount, 0);
-            const taxable_amount = (line_item.tax_exclusive_price * line_item.quantity) - (total_line_item_discount ?? 0);
-
-            let tax_amount = line_item.VAT_percent * taxable_amount;
-            addTaxSubtotal(taxable_amount, tax_amount, line_item.VAT_percent, line_item.VAT_exemption_reason || 'Not Subject To VAT');
-            taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
-            line_item.other_taxes?.map((tax) => {
-                tax_amount = tax.percent_amount * taxable_amount;
-                addTaxSubtotal(taxable_amount, tax_amount, tax.percent_amount, line_item.VAT_exemption_reason || 'Not Subject To VAT');
-                taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
-            });
-        });
-
+        t.forEach((r: any) => {
+            addTaxSubtotal(r.TaxableAmount, r.TaxAmount, r.Percent, "" || 'Not Subject To VAT');
+            taxes_total += parseFloat(r.TaxAmount.toFixedNoRounding(2));
+        })
+        groupExtraByPerc.forEach((r: { TaxableAmount: number, TaxAmount: number, Percent: number}) => {
+            addTaxSubtotal(r.TaxableAmount, r.TaxAmount, r.Percent, "" || 'Not Subject To VAT');
+            taxes_total += parseFloat(r.TaxAmount.toFixedNoRounding(2));
+        })
         // BT-110
         taxes_total = parseFloat(taxes_total.toFixed(2));
-
         // BR-DEC-13, MESSAGE : [BR-DEC-13]-The allowed maximum number of decimals for the Invoice total VAT amount (BT-110) is 2.
         return [
             {
@@ -337,12 +489,14 @@ export class ZATCASimplifiedTaxInvoice {
             });
         }
 
+        // this.invoice_xml.set("Invoice/cac:AllowanceCharge>", true, this.constructAllowanceCharge(line_items));
         this.invoice_xml.set("Invoice/cac:TaxTotal", false, this.constructTaxTotal(line_items));
 
         this.invoice_xml.set("Invoice/cac:LegalMonetaryTotal", true, this.constructLegalMonetaryTotal(
             total_subtotal,
             total_taxes
         ));
+
 
         invoice_line_items.map((line_item) => {
             this.invoice_xml.set("Invoice/cac:InvoiceLine", false, line_item);

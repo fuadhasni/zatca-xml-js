@@ -19,6 +19,36 @@ const line_item: ZATCASimplifiedInvoiceLineItem = {
     ],
     VAT_exemption_reason: ""
 };
+const line_item2: ZATCASimplifiedInvoiceLineItem = {
+    id: "1",
+    name: "TEST NAME",
+    quantity: 5,
+    tax_exclusive_price: 10,
+    VAT_percent: 0.13,
+    other_taxes: [
+        { percent_amount: 1 }
+    ],
+    discounts: [
+        { amount: 2, reason: "A discount" },
+        { amount: 2, reason: "A second discount" }
+    ],
+    VAT_exemption_reason: ""
+};
+const line_item3: ZATCASimplifiedInvoiceLineItem = {
+    id: "1",
+    name: "TEST NAME",
+    quantity: 5,
+    tax_exclusive_price: 10,
+    VAT_percent: 0.10,
+    other_taxes: [
+        { percent_amount: 1 }
+    ],
+    discounts: [
+        { amount: 2, reason: "A discount" },
+        { amount: 2, reason: "A second discount" }
+    ],
+    VAT_exemption_reason: ""
+};
 
 // Sample EGSUnit
 const egsunit: EGSUnitInfo = {
@@ -37,7 +67,8 @@ const egsunit: EGSUnitInfo = {
         postal_zone: "31952"
     },
     branch_name: "My Branch Name",
-    branch_industry: "Food"
+    branch_industry: "Food",
+    invoice_type: "0100",
 };
 
 // Sample Invoice
@@ -76,9 +107,11 @@ const main = async () => {
 
         // Sign invoice
         const { signed_invoice_string, invoice_hash, qr } = egs.signInvoice(invoice);
+        // console.log(signed_invoice_string);
 
         // Check invoice compliance
-        console.log(await egs.checkInvoiceCompliance(signed_invoice_string, invoice_hash));
+        const compliance = await egs.checkInvoiceCompliance(signed_invoice_string, invoice_hash)
+        console.log(compliance.validationResults);
 
         // Issue production certificate
         const production_request_id = await egs.issueProductionCertificate(compliance_request_id);

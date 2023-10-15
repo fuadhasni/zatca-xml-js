@@ -33,7 +33,7 @@ export interface EGSUnitInfo {
     branch_name: string,
     branch_industry: string,
     location: EGSUnitLocation,
-
+    invoice_type: string,
     private_key?: string,
     csr?: string,
     compliance_certificate?: string,
@@ -98,7 +98,8 @@ const generateCSR = async (egs_info: EGSUnitInfo, production: boolean, solution_
         branch_name: egs_info.branch_name,
         taxpayer_name: egs_info.VAT_name,
         taxpayer_provided_id: egs_info.custom_id,
-        production: production
+        production: production,
+        invoice_type: egs_info.invoice_type,
     }));
     
     const cleanUp = () => {

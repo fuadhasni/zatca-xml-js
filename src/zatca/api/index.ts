@@ -119,20 +119,23 @@ class API {
                 "Accept-Language": "en",
             };
 
-            const response = await axios.post(`${this.baseUrl}/compliance/invoices`,
-                {
-                    invoiceHash: invoice_hash,
-                    uuid: egs_uuid,
-                    invoice: Buffer.from(signed_xml_string).toString("base64")
-                },
-                { headers: { ...auth_headers, ...headers } }
-            );
+            try {
+                const response = await axios.post(`${this.baseUrl}/compliance/invoices`,
+                    {
+                        invoiceHash: invoice_hash,
+                        uuid: egs_uuid,
+                        invoice: Buffer.from(signed_xml_string).toString("base64")
+                    },
+                    { headers: { ...auth_headers, ...headers } });
 
 
-            if (response.status >= 200 && response.status < 300) {
-                return response.data
-            } else {
-                throw new Error("Error in compliance check.");
+                if (response.status >= 200 && response.status < 300) {
+                    return response.data
+                } else {
+                    throw new Error("Error in compliance check.");
+                }
+            } catch (error:any) {
+                console.log(error.response.data.validationResults);
             }
         }
 
