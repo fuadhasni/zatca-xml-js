@@ -71,7 +71,7 @@ export class ZATCAStandardTaxInvoice {
         const VAT = {
             "cbc:ID": line_item.VAT_percent ? "S" : "O",
             // BT-120, KSA-121
-            "cbc:Percent": line_item.VAT_percent ? (line_item.VAT_percent * 100).toFixedNoRounding(2) : undefined,
+            "cbc:Percent": line_item.VAT_percent ? (line_item.VAT_percent * 100).toFixedNoRounding(2) : "0.00",
             "cac:TaxScheme": {
                 "cbc:ID": "VAT"
             }
@@ -122,7 +122,7 @@ export class ZATCAStandardTaxInvoice {
             },
             "cbc:RoundingAmount": {
                 "@_currencyID": "SAR",
-                "#text": (parseFloat(line_item_subtotal.toFixedNoRounding(2)) + parseFloat(line_item_total_taxes.toFixedNoRounding(2))).toFixed(2)
+                "#text": (parseFloat(line_item_subtotal.toFixed(2)) + parseFloat(line_item_total_taxes.toFixed(2))).toFixedNoRounding(2)
             }
         };
 
@@ -218,10 +218,12 @@ export class ZATCAStandardTaxInvoice {
     private getTaxCategoryCode = (exemption_reason: string) => {
         let returnCode: {
             code: string | undefined,
-            value: string
+            value: string,
+            text: string
         } = {
             code: undefined,
-            value: 'O'
+            value: 'O',
+            text: exemption_reason
         } // Services outside scope of tax / Not subject to VAT
 
         codes.forEach(doc => {
@@ -255,7 +257,8 @@ export class ZATCAStandardTaxInvoice {
                     },
                     "cbc:Percent": (tax_percent * 100).toFixedNoRounding(2),
                     // BR-O-10
-                    "cbc:TaxExemptionReason": tax_percent ? undefined : tax_exemption_reason,
+                    "cbc:TaxExemptionReasonCode": tax_percent ? undefined : this.getTaxCategoryCode(tax_exemption_reason).code,
+                    "cbc:TaxExemptionReason": tax_percent ? undefined : this.getTaxCategoryCode(tax_exemption_reason).text, 
                     "cac:TaxScheme": {
                         "cbc:ID": {
                             "@_schemeAgencyID": "6",
@@ -273,7 +276,7 @@ export class ZATCAStandardTaxInvoice {
             const taxable_amount = (line_item.tax_exclusive_price * line_item.quantity) - (total_line_item_discount ?? 0);
 
             let tax_amount = line_item.VAT_percent * taxable_amount;
-            addTaxSubtotal(taxable_amount, tax_amount, line_item.VAT_percent, line_item.VAT_exemption_reason || 'Not Subject To VAT');
+            // addTaxSubtotal(taxable_amount, tax_amount, line_item.VAT_percent, line_item.VAT_exemption_reason || 'Not Subject To VAT');
             taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
             line_item.other_taxes?.map((tax) => {
                 tax_amount = tax.percent_amount * taxable_amount;
@@ -282,6 +285,28 @@ export class ZATCAStandardTaxInvoice {
             });
         });
 
+        const uniqueRecords = line_items.filter(
+            (item, index, self) => index === self.findIndex((t) => t.VAT_exemption_reason === item.VAT_exemption_reason)
+        );
+
+        uniqueRecords.forEach((doc) => {
+            const taxableElements = line_items.filter(obj => obj.VAT_exemption_reason === doc.VAT_exemption_reason);
+            const taxableAmount = taxableElements.reduce((acc,i) => {
+                const total_line_item_discount = i.discounts?.reduce((p, c) => p + c.amount, 0);
+                return acc + (i.tax_exclusive_price * i.quantity) - (total_line_item_discount ?? 0)
+            }, 0);
+            const totalTaxOfItem = taxableElements.reduce((acc,i) => {
+                const total_line_item_discount = i.discounts?.reduce((p, c) => p + c.amount, 0);
+                const taxableAmountOfItem = (i.tax_exclusive_price * i.quantity) - (total_line_item_discount ?? 0);
+                return acc + (i.VAT_percent * taxableAmountOfItem);
+            }, 0);
+
+            const taxPercentage = doc.VAT_percent;
+            addTaxSubtotal(taxableAmount, totalTaxOfItem, taxPercentage, doc.VAT_exemption_reason || 'Not Subject To VAT');
+
+        });
+
+        
         // BT-110
         taxes_total = parseFloat(taxes_total.toFixed(2));
 
