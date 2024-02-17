@@ -167,7 +167,7 @@ export class ZATCAStandardTaxInvoice {
                 "cac:Price": {
                     "cbc:PriceAmount": {
                         "@_currencyID": "SAR",
-                        "#text": line_item.tax_exclusive_price
+                        "#text": line_item.tax_exclusive_price.toFixedNoRounding(2)
                     },
                     "cac:AllowanceCharge": cacAllowanceCharges
                 }
@@ -197,7 +197,7 @@ export class ZATCAStandardTaxInvoice {
             // BR-DEC-14, BT-112
             "cbc:TaxInclusiveAmount": {
                 "@_currencyID": "SAR",
-                "#text": (parseFloat((tax_exclusive_subtotal + taxes_total).toFixed(2)))
+                "#text": (parseFloat((tax_exclusive_subtotal + taxes_total).toFixedNoRounding(2)))
             },
             "cbc:AllowanceTotalAmount": {
                 "@_currencyID": "SAR",
@@ -210,7 +210,7 @@ export class ZATCAStandardTaxInvoice {
             // BR-DEC-18, BT-112
             "cbc:PayableAmount": {
                 "@_currencyID": "SAR",
-                "#text": (parseFloat((tax_exclusive_subtotal + taxes_total).toFixed(2)))
+                "#text": (parseFloat((tax_exclusive_subtotal + taxes_total).toFixedNoRounding(2)))
             }
         }
     }
