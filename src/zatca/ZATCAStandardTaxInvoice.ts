@@ -221,7 +221,7 @@ export class ZATCAStandardTaxInvoice {
             value: string,
             text: string
         } = {
-            code: undefined,
+            code: 'VATEX-SA-OOS',
             value: 'O',
             text: exemption_reason
         } // Services outside scope of tax / Not subject to VAT
@@ -231,6 +231,7 @@ export class ZATCAStandardTaxInvoice {
                 returnCode = doc
             }
         });
+
         return returnCode;
     }
 

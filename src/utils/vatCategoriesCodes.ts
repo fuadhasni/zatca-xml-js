@@ -83,10 +83,5 @@ export const codes = [
         code: 'VATEX-SA-MLTRY',
         value: 'Z',
         text: `supply of qualified military goods`
-    },
-    {
-        code: 'VATEX-SA-OOS',
-        value: 'O',
-        text: ``
     }
 ];
