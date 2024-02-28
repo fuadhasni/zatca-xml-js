@@ -278,11 +278,11 @@ export class ZATCAStandardTaxInvoice {
 
             let tax_amount = line_item.VAT_percent * taxable_amount;
             // addTaxSubtotal(taxable_amount, tax_amount, line_item.VAT_percent, line_item.VAT_exemption_reason || 'Not Subject To VAT');
-            taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
+            taxes_total += tax_amount;
             line_item.other_taxes?.map((tax) => {
                 tax_amount = tax.percent_amount * taxable_amount;
                 addTaxSubtotal(taxable_amount, tax_amount, tax.percent_amount, line_item.VAT_exemption_reason || 'Not Subject To VAT');
-                taxes_total += parseFloat(tax_amount.toFixedNoRounding(2));
+                taxes_total += tax_amount;
             });
         });
 
@@ -340,10 +340,18 @@ export class ZATCAStandardTaxInvoice {
         line_items.map((line_item) => {
             const { line_item_xml, line_item_totals } = this.constructLineItem(line_item);
 
-            total_taxes += parseFloat(line_item_totals.taxes_total.toFixedNoRounding(2));
-            total_subtotal += parseFloat(line_item_totals.subtotal.toFixedNoRounding(2));
-
+            total_subtotal += parseFloat(line_item_totals.subtotal.toFixed(2));
             invoice_line_items.push(line_item_xml);
+
+            // calculating tax
+            const total_line_item_discount = line_item.discounts?.reduce((p, c) => p + c.amount, 0);
+            const taxable_amount = (line_item.tax_exclusive_price * line_item.quantity) - (total_line_item_discount ?? 0);
+            let tax_amount = line_item.VAT_percent * taxable_amount;
+            total_taxes += tax_amount;
+            line_item.other_taxes?.map((tax) => {
+                tax_amount = tax.percent_amount * taxable_amount;
+                total_taxes += tax_amount;
+            });
         });
 
         // BT-110
