@@ -309,7 +309,7 @@ export class ZATCAStandardTaxInvoice {
 
         
         // BT-110
-        taxes_total = parseFloat(taxes_total.toFixed(2));
+        // taxes_total = taxes_total;
 
         // BR-DEC-13, MESSAGE : [BR-DEC-13]-The allowed maximum number of decimals for the Invoice total VAT amount (BT-110) is 2.
         return [
@@ -355,8 +355,8 @@ export class ZATCAStandardTaxInvoice {
         });
 
         // BT-110
-        total_taxes = parseFloat(total_taxes.toFixed(2))
-        total_subtotal = parseFloat(total_subtotal.toFixed(2))
+        // total_taxes = parseFloat(total_taxes.toFixed(2))
+        // total_subtotal = parseFloat(total_subtotal.toFixed(2))
 
         if (props.cancelation) {
             // Invoice canceled. Tunred into credit/debit note. Must have PaymentMeans
