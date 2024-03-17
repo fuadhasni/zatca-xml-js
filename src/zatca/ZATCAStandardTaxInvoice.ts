@@ -100,11 +100,10 @@ export class ZATCAStandardTaxInvoice {
 
         // Calc total taxes
         // BR-KSA-DEC-02
-        line_item_total_taxes = parseFloat(line_item_total_taxes.toFixedNoRounding(2)) + parseFloat((line_item_subtotal * line_item.VAT_percent).toFixedNoRounding(2));
+        line_item_total_taxes = line_item_total_taxes + (line_item_subtotal * line_item.VAT_percent);
         line_item_total_taxes = parseFloat(line_item_total_taxes.toFixedNoRounding(2));
         line_item.other_taxes?.map((tax) => {
-            line_item_total_taxes = parseFloat(line_item_total_taxes.toFixedNoRounding(2)) + parseFloat((tax.percent_amount * line_item_subtotal).toFixedNoRounding(2));
-            line_item_total_taxes = parseFloat(line_item_total_taxes.toFixedNoRounding(2));
+            line_item_total_taxes = line_item_total_taxes + (tax.percent_amount * line_item_subtotal);
             cacClassifiedTaxCategories.push({
                 "cbc:ID": "S",
                 "cbc:Percent": (tax.percent_amount * 100).toFixedNoRounding(2),
@@ -122,7 +121,7 @@ export class ZATCAStandardTaxInvoice {
             },
             "cbc:RoundingAmount": {
                 "@_currencyID": "SAR",
-                "#text": (parseFloat(line_item_subtotal.toFixed(2)) + parseFloat(line_item_total_taxes.toFixed(2))).toFixedNoRounding(2)
+                "#text": (line_item_subtotal + line_item_total_taxes).toFixedNoRounding(2)
             }
         };
 
@@ -355,8 +354,8 @@ export class ZATCAStandardTaxInvoice {
         });
 
         // BT-110
-        // total_taxes = parseFloat(total_taxes.toFixed(2))
-        // total_subtotal = parseFloat(total_subtotal.toFixed(2))
+        total_taxes = parseFloat(total_taxes.toFixedNoRounding(2));
+        total_subtotal = parseFloat(total_subtotal.toFixedNoRounding(2));
 
         if (props.cancelation) {
             // Invoice canceled. Tunred into credit/debit note. Must have PaymentMeans
