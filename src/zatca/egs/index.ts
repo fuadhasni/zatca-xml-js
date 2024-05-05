@@ -6,7 +6,7 @@
  */
 
 import { spawn } from "child_process";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, v4 } from 'uuid';
 import fs from "fs";
 
 import defaultCSRConfig from "../templates/csr_template";
@@ -33,7 +33,7 @@ export interface EGSUnitInfo {
     branch_name: string,
     branch_industry: string,
     location: EGSUnitLocation,
-
+    current_invoice_uuid: string,
     private_key?: string,
     csr?: string,
     compliance_certificate?: string,
@@ -132,7 +132,6 @@ export class EGS {
         this.api = new API(isProduction);
     }
 
-
     /**
      * @returns EGSUnitInfo
      */
@@ -211,7 +210,7 @@ export class EGS {
         return await this.api.compliance(this.egs_info.compliance_certificate, this.egs_info.compliance_api_secret).checkInvoiceCompliance(
             signed_invoice_string,
             invoice_hash,
-            this.egs_info.uuid
+            this.egs_info.current_invoice_uuid as string
         );
     }
 
@@ -228,7 +227,7 @@ export class EGS {
         return await this.api.production(this.egs_info.production_certificate, this.egs_info.production_api_secret).reportInvoice(
             signed_invoice_string,
             invoice_hash,
-            this.egs_info.uuid
+            this.egs_info.current_invoice_uuid as string
         );
     }
 
@@ -244,7 +243,7 @@ export class EGS {
             return await this.api.production(this.egs_info.production_certificate, this.egs_info.production_api_secret).clearInvoice(
                 signed_invoice_string,
                 invoice_hash,
-                this.egs_info.uuid
+                this.egs_info.current_invoice_uuid as string
             );
         }
 

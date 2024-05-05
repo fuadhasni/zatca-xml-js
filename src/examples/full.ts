@@ -24,6 +24,7 @@ const line_item: ZATCASimplifiedInvoiceLineItem = {
 const egsunit: EGSUnitInfo = {
     uuid: "6f4d20e0-6bfe-4a80-9389-7dabe6620f12",
     custom_id: "EGS1-886431145",
+    current_invoice_uuid: "9f4w20e0-6bfe-4a80-9399-7dabe2220f12",
     model: "IOS",
     CRN_number: "454634645645654",
     VAT_name: "Wesam Alzahir",
