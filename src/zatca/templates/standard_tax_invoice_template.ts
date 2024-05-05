@@ -118,7 +118,7 @@ export default function populate(props: ZATCAStandardInvoiceProps): string {
   populated_template = populated_template.replace("SET_INVOICE_SERIAL_NUMBER", props.invoice_serial_number);
   populated_template = populated_template.replace("SET_TERMINAL_UUID", props.egs_info.current_invoice_uuid  as string);  // as per BR-KSA-03
   populated_template = populated_template.replace("SET_ISSUE_DATE", props.issue_date);
-  populated_template = populated_template.replace("SET_ISSUE_TIME", props.issue_time);
+  populated_template = populated_template.replace("SET_ISSUE_TIME", props.issue_time + 'Z');
   populated_template = populated_template.replace("SET_PREVIOUS_INVOICE_HASH", props.previous_invoice_hash);
   populated_template = populated_template.replace("SET_INVOICE_COUNTER_NUMBER", props.invoice_counter_number.toString());
   populated_template = populated_template.replace("SET_COMMERCIAL_REGISTRATION_NUMBER", props.egs_info.CRN_number);

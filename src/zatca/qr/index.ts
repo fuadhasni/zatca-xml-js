@@ -33,7 +33,8 @@ export const generateQR = ({invoice_xml, digital_signature, public_key, certific
     const VAT_total = invoice_xml.get("Invoice/cac:TaxTotal")?.[0]["cbc:TaxAmount"]["#text"].toString();
     
     const issue_date = invoice_xml.get("Invoice/cbc:IssueDate")?.[0];
-    const issue_time = invoice_xml.get("Invoice/cbc:IssueTime")?.[0];
+    let issue_time = invoice_xml.get("Invoice/cbc:IssueTime")?.[0] as any;
+    issue_time = issue_time.replace('Z','');
 
     // Detect if simplified invoice or not (not used currently assuming all simplified tax invoice)
     const invoice_type = invoice_xml.get("Invoice/cbc:InvoiceTypeCode")?.[0]["@_name"].toString();
@@ -72,7 +73,8 @@ export const generateQR = ({invoice_xml, digital_signature, public_key, certific
     const VAT_total = invoice_xml.get("Invoice/cac:TaxTotal")?.[0]["cbc:TaxAmount"]["#text"].toString();
     
     const issue_date = invoice_xml.get("Invoice/cbc:IssueDate")?.[0];
-    const issue_time = invoice_xml.get("Invoice/cbc:IssueTime")?.[0];
+    let issue_time = invoice_xml.get("Invoice/cbc:IssueTime")?.[0] as any;
+    issue_time = issue_time.replace('Z','');
 
     const datetime = `${issue_date} ${issue_time}`;
     const formatted_datetime = moment(datetime).format("YYYY-MM-DDTHH:mm:ss")+"Z";

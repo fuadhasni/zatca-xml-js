@@ -18,7 +18,7 @@ const template = /* XML */`
     <cbc:UUID>SET_TERMINAL_UUID</cbc:UUID>
     <cbc:IssueDate>SET_ISSUE_DATE</cbc:IssueDate>
     <cbc:IssueTime>SET_ISSUE_TIME</cbc:IssueTime>
-    <cbc:InvoiceTypeCode name="0211010">SET_INVOICE_TYPE</cbc:InvoiceTypeCode>
+    <cbc:InvoiceTypeCode name="0200000">SET_INVOICE_TYPE</cbc:InvoiceTypeCode>
     <cbc:DocumentCurrencyCode>SAR</cbc:DocumentCurrencyCode>
     <cbc:TaxCurrencyCode>SAR</cbc:TaxCurrencyCode>
     SET_BILLING_REFERENCE
@@ -142,7 +142,7 @@ export default function populate(props: ZATCASimplifiedInvoiceProps): string {
     populated_template = populated_template.replace("SET_INVOICE_SERIAL_NUMBER", props.invoice_serial_number);
     populated_template = populated_template.replace("SET_TERMINAL_UUID", props.egs_info.current_invoice_uuid as string); // as per BR-KSA-03
     populated_template = populated_template.replace("SET_ISSUE_DATE", props.issue_date);
-    populated_template = populated_template.replace("SET_ISSUE_TIME", props.issue_time);
+    populated_template = populated_template.replace("SET_ISSUE_TIME", props.issue_time + 'Z');
     populated_template = populated_template.replace("SET_PREVIOUS_INVOICE_HASH", props.previous_invoice_hash);
     populated_template = populated_template.replace("SET_INVOICE_COUNTER_NUMBER", props.invoice_counter_number.toString());
     populated_template = populated_template.replace("SET_COMMERCIAL_REGISTRATION_NUMBER", props.egs_info.CRN_number);
