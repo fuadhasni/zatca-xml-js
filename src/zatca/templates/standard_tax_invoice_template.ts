@@ -85,18 +85,19 @@ const template = /* XML */`
 `;
 
 export interface ZATCAStandardInvoiceCustomer {
-  registered_name: string,
-  street: string,
-  additional_street_name: string,
-  building_number: string,
-  plot_Identification: string,
-  city_subdivision_name: string,
-  city: string,
-  postcode: string,
-  country_subentity: string,
-  country: string,
-  vat_id?: string,
-  crn?: string
+    registered_name: string;
+    street: string;
+    additional_street_name: string;
+    building_number: string;
+    plot_Identification: string;
+    city_subdivision_name: string;
+    city: string;
+    postcode: string;
+    country_subentity: string;
+    country: string;
+    vat_id?: string;
+    crn?: string;
+    scheme_id?: string;
 }
 
 export interface ZATCAStandardInvoiceProps extends ZATCASimplifiedInvoiceProps {
